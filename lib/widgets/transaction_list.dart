@@ -3,78 +3,69 @@ import "package:intl/intl.dart";
 
 import "../models/transaction.dart";
 
-class TransactionList extends StatefulWidget {
-  @override
-  State<TransactionList> createState() => _TransactionListState();
-}
+class TransactionList extends StatelessWidget {
+  final List<Transaction> transactions;
+  final Function deleteTx;
 
-class _TransactionListState extends State<TransactionList> {
-  final List<Transaction> _userTransactions = [
-    Transaction(
-      id: "t1",
-      title: "New Showes",
-      amount: 69.99,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: "t2",
-      title: "New Dress",
-      amount: 18.99,
-      date: DateTime.now(),
-    ),
-  ];
+  TransactionList(this.transactions, this.deleteTx);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: _userTransactions.map((tx) {
-        return Card(
-          child: Row(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 15,
+    return Container(
+      height: 450,
+      child: transactions.isEmpty
+          ? Column(
+              children: <Widget>[
+                Text(
+                  "No transactions added yet!",
+                  style: Theme.of(context).textTheme.headline6,
                 ),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.pink.shade300,
-                    width: 2,
-                  ),
+                SizedBox(
+                  height: 20,
                 ),
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  "\$${tx.amount}",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.pink.shade300,
+                Container(
+                    height: 200,
+                    child: Image.asset(
+                      "assets/images/waiting.png",
+                      fit: BoxFit.cover,
+                    )),
+              ],
+            )
+          : ListView.builder(
+              itemBuilder: (context, index) {
+                return Card(
+                  elevation: 5,
+                  margin: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 5,
                   ),
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    tx.title,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange),
-                  ),
-                  Text(
-                    DateFormat.yMMMMd().format(tx.date),
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 13,
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 30,
+                      child: Padding(
+                        padding: EdgeInsets.all(6),
+                        child: FittedBox(
+                          child: Text("\$${transactions[index].amount}"),
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      transactions[index].title,
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                    subtitle: Text(
+                      DateFormat.yMMMd().format(transactions[index].date),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      color: Theme.of(context).errorColor,
+                      onPressed: () => deleteTx(transactions[index].id),
                     ),
                   ),
-                ],
-              )
-            ],
-          ),
-        );
-      }).toList(),
+                );
+              },
+              itemCount: transactions.length,
+            ),
     );
   }
 }
